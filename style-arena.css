@@ -1,0 +1,358 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+    user-select: none;
+}
+
+body {
+    background-color: #000;
+    color: white;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    position: relative;
+}
+
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    background-image: url('assets/fundo-arena.png');
+    /* ATUALIZADO PARA fundo.jpg */
+    background-size: cover;
+    background-position: center;
+    cursor: crosshair;
+}
+
+/* EFEITOS DE TELA */
+#damage-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle, transparent 40%, rgba(255, 0, 0, 0.4) 100%);
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.pulse-red {
+    animation: pulseAnim 1s infinite;
+    opacity: 1 !important;
+}
+
+@keyframes pulseAnim {
+
+    0%,
+    100% {
+        background: radial-gradient(circle, transparent 50%, rgba(255, 0, 0, 0.2) 100%);
+    }
+
+    50% {
+        background: radial-gradient(circle, transparent 30%, rgba(255, 0, 0, 0.6) 100%);
+    }
+}
+
+#spectator-ui {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 0, 0, 0.6);
+    padding: 10px 30px;
+    border-radius: 20px;
+    font-weight: bold;
+    z-index: 100;
+    border: 1px solid white;
+}
+
+/* HUD */
+.hud-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    pointer-events: none;
+}
+
+.hud-alive {
+    font-size: 1.2em;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1px solid #00d2ff;
+    pointer-events: auto;
+}
+
+.hud-alive .highlight {
+    color: #00d2ff;
+    font-weight: 900;
+}
+
+.hud-zone {
+    font-size: 1.1em;
+    font-weight: 900;
+    color: #ff3d68;
+    text-shadow: 0 0 10px #ff3d68;
+}
+
+.btn-leave {
+    pointer-events: auto;
+    background: rgba(255, 61, 104, 0.1);
+    border: 1px solid #ff3d68;
+    color: #ff3d68;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-leave:hover {
+    background: #ff3d68;
+    color: white;
+}
+
+.kill-feed {
+    position: absolute;
+    top: 130px;
+    right: 40px;
+    width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 10;
+}
+
+.feed-item {
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 0.85em;
+    border-left: 4px solid #00d2ff;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.hud-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+    display: flex;
+    justify-content: flex-start;
+    padding: 30px 40px;
+    pointer-events: none;
+}
+
+.player-status {
+    width: 380px;
+    background: rgba(0, 0, 0, 0.85);
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid #00d2ff;
+    box-shadow: 0 0 20px black;
+}
+
+.hp-bar-container {
+    width: 100%;
+    height: 18px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 9px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.hp-bar-fill {
+    height: 100%;
+    width: 100%;
+    background: #00d2ff;
+    transition: width 0.3s;
+}
+
+.attack-energy-container {
+    position: relative;
+    width: 100%;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pips-list {
+    display: flex;
+    gap: 8px;
+}
+
+.pip {
+    width: 14px;
+    height: 14px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.pip.filled {
+    background: #00ff88;
+    box-shadow: 0 0 10px #00ff88;
+}
+
+.circular-loader {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 8px;
+}
+
+.loader-inner {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: conic-gradient(#00ff88 0%, transparent 0%);
+}
+
+/* TELA DE RANKING (GAME OVER) */
+.overlay-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#winner-text {
+    font-size: 3.5em;
+    color: #fff;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    margin-bottom: 20px;
+    font-weight: 900;
+}
+
+.ranking-container {
+    width: 450px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 25px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.ranking-container h3 {
+    text-align: center;
+    margin-bottom: 15px;
+    color: #aaa;
+    letter-spacing: 3px;
+    font-size: 0.9em;
+}
+
+.rank-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 1.1em;
+}
+
+.rank-item:last-child {
+    border: none;
+}
+
+.rank-pos {
+    font-weight: 900;
+    width: 40px;
+    color: #00d2ff;
+}
+
+.rank-name {
+    flex: 1;
+    text-align: left;
+}
+
+.rank-status {
+    font-size: 0.8em;
+    color: #777;
+    font-weight: bold;
+}
+
+/* Destaque para o vencedor */
+.rank-item.winner {
+    background: rgba(0, 210, 255, 0.15);
+    border-radius: 10px;
+    color: #00d2ff;
+    font-size: 1.3em;
+    margin-bottom: 10px;
+}
+
+.rank-item.winner .rank-pos {
+    color: #fff;
+}
+
+.end-actions {
+    display: flex;
+    gap: 15px;
+}
+
+.btn-play-again {
+    background: #00d2ff;
+    color: black;
+    padding: 18px 45px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 1.1em;
+}
+
+.btn-play-again:hover {
+    transform: scale(1.05);
+    background: #00ffff;
+}
+
+.btn-menu {
+    background: white;
+    color: black;
+    padding: 5px 15px;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.8em;
+}

@@ -1,0 +1,173 @@
+/* Resets básicos */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Corpo com o fundo cósmico */
+body {
+    background-image: url('assets/fundo.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Contêiner principal estruturado em COLUNA */
+.login-container {
+    display: flex;
+    flex-direction: column;
+    /* Coloca a logo em cima e o login embaixo */
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    /* Espaço entre a logo e a caixa de login */
+    width: 100%;
+    padding: 20px;
+}
+
+/* Estilo da Logo */
+.game-logo img {
+    max-width: 450px;
+    /* Controla o tamanho da logo para não estourar a tela */
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.8));
+    /* Sombra para destacar do fundo */
+    animation: float 4s ease-in-out infinite;
+    /* Efeito de flutuação suave */
+}
+
+/* Animação de flutuação para a logo */
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+/* Painel de Vidro Fosco Central */
+.login-panel {
+    background: rgba(10, 15, 30, 0.6);
+    /* Fundo mais escuro para ler melhor */
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 210, 255, 0.4);
+    border-radius: 15px;
+    padding: 40px;
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(0, 210, 255, 0.1);
+}
+
+/* Grupos de Entrada */
+.input-group {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+/* Ícones de Entrada */
+.input-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #00d2ff;
+    /* Ícones em azul neon */
+}
+
+/* Campos de Entrada de Texto */
+.input-group input {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(0, 210, 255, 0.3);
+    border-radius: 8px;
+    color: white;
+    padding: 15px 15px 15px 45px;
+    width: 100%;
+    font-size: 1em;
+    transition: all 0.3s;
+}
+
+.input-group input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #00d2ff;
+    box-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
+    background: rgba(0, 0, 0, 0.8);
+}
+
+/* Botão de Login Estilo Gamer */
+.login-button {
+    background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 15px;
+    width: 100%;
+    font-weight: 800;
+    font-size: 1.1em;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-transform: uppercase;
+    box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.button-arrow {
+    margin-left: 10px;
+    font-size: 0.9em;
+}
+
+.login-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 30px rgba(0, 210, 255, 0.8);
+    filter: brightness(1.2);
+}
+
+.login-button:active {
+    transform: scale(0.98);
+}
+
+/* Links Inferiores */
+.login-links {
+    margin-top: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.login-links a {
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    font-size: 0.85em;
+    transition: 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+
+.login-links a:hover {
+    color: #00d2ff;
+    text-shadow: 0 0 10px #00d2ff;
+}

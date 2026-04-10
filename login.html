@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battle Arena Login</title>
+    <link rel="stylesheet" href="style-login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="shortcut icon" href="assets/logo-los.png" type="image/x-icon">
+</head>
+
+<body>
+
+    <div class="login-container">
+
+        <div class="game-logo">
+            <img src="assets/logo-los.png" alt="Last One Standing Logo">
+        </div>
+
+        <div class="login-panel">
+            <form id="login-form">
+                <div class="input-group">
+                    <i class="fas fa-envelope input-icon"></i>
+                    <input type="email" placeholder="name@example.com" required>
+                </div>
+
+                <div class="input-group">
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" placeholder="********" required>
+                </div>
+
+                <button type="submit" class="login-button">
+                    LOGIN <i class="fas fa-chevron-right button-arrow"></i>
+                </button>
+            </form>
+
+            <div class="login-links">
+                <a href="#">ESQUECEU A SENHA?</a>
+                <a href="#">CRIAR CONTA</a>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function (event) {
+            // Isso impede que a página recarregue (o comportamento padrão de um form)
+            event.preventDefault();
+
+            // Muda o texto do botão para dar um feedback visual
+            const btn = document.querySelector('.login-button');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AUTENTICANDO...';
+
+            // Aguarda 0.8 segundos (800ms) e redireciona para o Menu
+            setTimeout(() => {
+                window.location.href = 'menu.html';
+            }, 800);
+        });
+    </script>
+
+</body>
+
+</html>
