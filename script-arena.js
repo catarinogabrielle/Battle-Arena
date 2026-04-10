@@ -1,5 +1,5 @@
 /**
- * BATTLE ARENA - ENGINE COM IA CORRIGIDA (NÃO VÃO PARA A ZONA MORTA)
+ * BATTLE ARENA - ENGINE COMPLETA COM TELA DE LOADING E IA AVANÇADA
  */
 
 const canvas = document.getElementById('gameCanvas');
@@ -35,7 +35,7 @@ window.addEventListener('resize', resizeCanvas); resizeCanvas();
 const CONFIG = {
     speedWalk: 3.2, speedRun: 6.5, meleeDamage: 40, rangedDamage: 25,
     zoneDamage: 1.2, zoneShrinkSpeed: 0.15, reloadFrames: 180,
-    regenDelay: 300, regenAmount: 0.5, zoneDelayFrames: 3600
+    regenDelay: 300, regenAmount: 0.5, zoneDelayFrames: 3600 // 60 segundos de tempo livre
 };
 
 const keys = {};
@@ -148,16 +148,13 @@ class Player {
 
             // ==========================================
             // PRIORIDADE MÁXIMA ABSOLUTA: NÃO SAIR DA ZONA
-            // Independente do tempo ou de inimigos
             // ==========================================
             if (distToZone > Game.zone.radius - 60) {
-                // Larga tudo e corre para o centro do mapa (Game.zone.x, Game.zone.y)
                 this.angle = Math.atan2(Game.zone.y - this.y, Game.zone.x - this.x);
-                moveX = Math.cos(this.angle) * sRun * 1.1; // Corre mais rápido pra sobreviver
+                moveX = Math.cos(this.angle) * sRun * 1.1;
                 moveY = Math.sin(this.angle) * sRun * 1.1;
                 this.botState = 'ZONE_FLEE';
             } else {
-                // COMBATE E PATRULHA NORMAL SE ESTIVER SEGURO
                 let newClosest = null; let minDist = Infinity;
                 Game.players.forEach(p => {
                     if (p !== this && p.alive) {
@@ -190,7 +187,7 @@ class Player {
                 }
                 else if (this.botState === 'WANDER') {
                     if (!this.wanderTarget || Math.hypot(this.wanderTarget.x - this.x, this.wanderTarget.y - this.y) < 25) {
-                        let r = Game.zone.radius * Math.random() * 0.6; // Patrulha mais no meio
+                        let r = Game.zone.radius * Math.random() * 0.6;
                         let theta = Math.random() * Math.PI * 2;
                         this.wanderTarget = { x: Game.zone.x + r * Math.cos(theta), y: Game.zone.y + r * Math.sin(theta) };
                     }
@@ -236,7 +233,7 @@ class Player {
                         }
                     }
                 }
-            } // Fim do else (Seguro da Zona)
+            }
         }
 
         this.x += moveX; this.y += moveY;
@@ -370,10 +367,10 @@ const Game = {
     frameCount: 0,
 
     init() {
+        this.active = true; // Garante que o jogo está ativo ao iniciar
         this.zone = { x: canvas.width / 2, y: canvas.height / 2, radius: Math.max(canvas.width, canvas.height) * 0.45 };
         const cX = canvas.width / 2; const cY = canvas.height / 2;
 
-        // AJUSTE: NASCIMENTO SEGURO DOS BOTS BASEADO NO TAMANHO DA TELA
         let offset = Math.min(canvas.width, canvas.height) * 0.25;
 
         this.players = [
@@ -452,4 +449,92 @@ const Game = {
         setTimeout(() => { elements.gameOver.classList.remove('hidden'); elements.spectatorUI.classList.add('hidden'); if (vencedor) { elements.winnerText.innerText = `${vencedor.name} VENCEU!`; elements.winnerText.style.color = vencedor.color; } }, 1500);
     }
 };
-window.onload = () => Game.init();
+
+// ==========================================
+// GERENCIADOR DE CARREGAMENTO (LOADING SCREEN - 15 SEGUNDOS)
+// ==========================================
+const LoadingManager = {
+    progress: 0,
+    bar: document.getElementById('loading-bar-fill'),
+    text: document.getElementById('loading-text'),
+    screen: document.getElementById('loading-screen'),
+
+    start() {
+        Game.active = false;
+
+        // Atualiza a cada 50ms. 
+        // 15.000ms (15s) / 50ms = 300 atualizações necessárias.
+        // 100% / 300 = 0.333% de incremento por atualização.
+        const interval = setInterval(() => {
+            this.progress += 0.333;
+
+            if (this.progress >= 100) {
+                this.progress = 100;
+                clearInterval(interval);
+                this.updateUI();
+
+                setTimeout(() => this.finish(), 1000);
+            } else {
+                this.updateUI();
+            }
+        }, 50);
+    },
+
+    updateUI() {
+        if (this.bar && this.text) {
+            this.bar.style.width = this.progress + '%';
+            // Usa Math.floor para esconder os números quebrados (ex: 33.333%)
+            this.text.innerText = `CARREGANDO ARENA... ${Math.floor(this.progress)}%`;
+        }
+    },
+
+    finish() {
+        if (this.screen) {
+            this.screen.style.opacity = '0';
+            this.screen.style.transition = 'opacity 0.5s ease';
+
+            setTimeout(() => {
+                this.screen.classList.add('hidden');
+                // EM VEZ DE Game.init(), CHAMAMOS A CONTAGEM:
+                CountdownManager.start();
+            }, 500);
+        } else {
+            CountdownManager.start();
+        }
+    }
+};
+
+const CountdownManager = {
+    counter: 5,
+    overlay: document.getElementById('countdown-overlay'),
+    numberEl: document.getElementById('countdown-number'),
+
+    start() {
+        this.overlay.classList.remove('hidden');
+        this.run();
+    },
+
+    run() {
+        if (this.counter > 0) {
+            this.numberEl.innerText = this.counter;
+            this.numberEl.style.animation = 'none'; // Reseta animação
+            this.numberEl.offsetHeight; // Trigger reflow
+            this.numberEl.style.animation = 'countdownPulse 1s infinite';
+
+            this.counter--;
+            setTimeout(() => this.run(), 1000);
+        } else {
+            // Quando chega a zero, mostra "BATALHA!"
+            this.numberEl.innerText = "BATALHA!";
+            this.numberEl.classList.add('start-text');
+
+            setTimeout(() => {
+                this.overlay.classList.add('hidden');
+                Game.init(); // AGORA SIM, O JOGO COMEÇA!
+            }, 1000);
+        }
+    }
+};
+
+// Inicia o carregamento ao abrir a página
+window.onload = () => LoadingManager.start();

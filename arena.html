@@ -11,6 +11,68 @@
 </head>
 
 <body>
+    <div id="loading-screen" class="overlay-screen">
+        <div class="tutorial-wrapper">
+            <h1 class="tutorial-title">GUIA DE CONTROLES</h1>
+
+            <div class="tutorial-panels">
+                <div class="tutorial-box">
+                    <div class="box-header">TECLADO</div>
+                    <div class="keyboard-layout">
+                        <div class="key-group">
+                            <div class="key-row">
+                                <div class="key hidden"></div>
+                                <div class="key active-key">W</div>
+                                <div class="key hidden"></div>
+                            </div>
+                            <div class="key-row">
+                                <div class="key active-key">A</div>
+                                <div class="key active-key">S</div>
+                                <div class="key active-key">D</div>
+                            </div>
+                        </div>
+                        <div class="key-desc">MOVER O PERSONAGEM</div>
+
+                        <div class="key spacebar active-key">ESPAÇO</div>
+                        <div class="key-desc">CORRER (SPRINT)</div>
+                    </div>
+                </div>
+
+                <div class="tutorial-box">
+                    <div class="box-header">MOUSE</div>
+                    <div class="mouse-layout">
+                        <div class="css-mouse">
+                            <div class="mouse-left-click active-click"></div>
+                            <div class="mouse-right-click"></div>
+                            <div class="mouse-scroll"></div>
+                        </div>
+                        <div class="mouse-desc">
+                            <div class="desc-item">
+                                <span class="highlight-text">MOVER O MOUSE</span>
+                                <span class="sub-text">Mirar e Direcionar</span>
+                            </div>
+                            <div class="desc-item">
+                                <span class="highlight-text">CLIQUE ESQUERDO</span>
+                                <span class="sub-text">Atacar (Ataque Básico)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="loading-bottom-wrapper">
+            <div class="loading-bar-container">
+                <div id="loading-bar-fill" class="loading-bar-fill"></div>
+            </div>
+            <div id="loading-text" class="loading-text">CARREGANDO ARENA... 0%</div>
+        </div>
+    </div>
+
+    <div id="countdown-overlay" class="hidden overlay-screen">
+        <div id="countdown-number">5</div>
+    </div>
+
     <div id="damage-overlay"></div>
     <div id="spectator-ui" class="hidden">MODO ESPECTADOR</div>
     <div id="spell-warning" class="hidden">⚠️ AVISO!</div>
@@ -43,8 +105,7 @@
             </div>
 
             <div class="pips-wrapper">
-                <div id="p1-pips-container" class="pips-container">
-                </div>
+                <div id="p1-pips-container" class="pips-container"></div>
                 <div id="p1-reloader" class="circular-loader hidden">
                     <div class="loader-inner"></div>
                 </div>
