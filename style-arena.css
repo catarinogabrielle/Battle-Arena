@@ -2,7 +2,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     user-select: none;
 }
 
@@ -23,13 +23,12 @@ canvas {
     height: 100vh;
     z-index: 1;
     background-image: url('assets/fundo-arena.png');
-    /* ATUALIZADO PARA fundo.jpg */
     background-size: cover;
     background-position: center;
     cursor: crosshair;
 }
 
-/* EFEITOS DE TELA */
+/* OVERLAYS E AVISOS */
 #damage-overlay {
     position: fixed;
     top: 0;
@@ -73,7 +72,37 @@ canvas {
     border: 1px solid white;
 }
 
-/* HUD */
+#spell-warning {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(177, 156, 217, 0.9);
+    color: #000;
+    padding: 15px 35px;
+    border-radius: 12px;
+    font-size: 1.3em;
+    font-weight: 900;
+    z-index: 100;
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.5);
+    animation: popInWarning 0.3s ease-out;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+@keyframes popInWarning {
+    0% {
+        transform: translate(-50%, -30px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translate(-50%, 0);
+        opacity: 1;
+    }
+}
+
+/* HUD SUPERIOR */
 .hud-top {
     position: absolute;
     top: 0;
@@ -102,7 +131,7 @@ canvas {
 }
 
 .hud-zone {
-    font-size: 1.1em;
+    font-size: 1.2em;
     font-weight: 900;
     color: #ff3d68;
     text-shadow: 0 0 10px #ff3d68;
@@ -117,6 +146,7 @@ canvas {
     border-radius: 8px;
     cursor: pointer;
     transition: 0.3s;
+    font-weight: bold;
 }
 
 .btn-leave:hover {
@@ -124,15 +154,17 @@ canvas {
     color: white;
 }
 
+/* FEED DE MORTES */
 .kill-feed {
     position: absolute;
-    top: 130px;
+    top: 90px;
     right: 40px;
     width: 280px;
     display: flex;
     flex-direction: column;
     gap: 8px;
     z-index: 10;
+    pointer-events: none;
 }
 
 .feed-item {
@@ -156,67 +188,97 @@ canvas {
     }
 }
 
+/* ========================================================= */
+/* NOVO HUD INFERIOR (ESTILO ESPORTS/MOBA) */
+/* ========================================================= */
 .hud-bottom {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
+    bottom: 30px;
+    left: 40px;
     z-index: 10;
-    display: flex;
-    justify-content: flex-start;
-    padding: 30px 40px;
     pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
-.player-status {
-    width: 380px;
-    background: rgba(0, 0, 0, 0.85);
-    padding: 20px;
-    border-radius: 15px;
+.player-panel {
+    background: rgba(10, 12, 16, 0.9);
     border: 1px solid #00d2ff;
-    box-shadow: 0 0 20px black;
+    border-radius: 16px;
+    padding: 20px 25px;
+    width: 400px;
+    box-shadow: 0 0 20px rgba(0, 210, 255, 0.15);
 }
 
-.hp-bar-container {
+.panel-header {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#player-name-hud {
+    color: #fff;
+    font-weight: bold;
+}
+
+#hud-weapon-name {
+    color: #e0e0e0;
+    font-weight: normal;
+}
+
+.hp-bar-bg {
     width: 100%;
-    height: 18px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 9px;
+    height: 20px;
+    background: #333;
+    border-radius: 10px;
     overflow: hidden;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
 }
 
 .hp-bar-fill {
     height: 100%;
     width: 100%;
     background: #00d2ff;
-    transition: width 0.3s;
+    transition: width 0.2s ease-out, background 0.3s;
 }
 
-.attack-energy-container {
-    position: relative;
-    width: 100%;
-    height: 30px;
+.pips-wrapper {
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
 }
 
-.pips-list {
+.pips-container {
     display: flex;
-    gap: 8px;
+    gap: 6px;
 }
 
+/* O Quadradinho de Energia */
 .pip {
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 3px;
+    border-radius: 4px;
+    /* Ligeiramente arredondado como na imagem */
+    transition: 0.2s;
 }
 
 .pip.filled {
     background: #00ff88;
-    box-shadow: 0 0 10px #00ff88;
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.8);
+}
+
+.pips-counter {
+    position: absolute;
+    right: 0;
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
 }
 
 .circular-loader {
@@ -226,15 +288,24 @@ canvas {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.8);
     border-radius: 8px;
 }
 
 .loader-inner {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     background: conic-gradient(#00ff88 0%, transparent 0%);
+}
+
+.controls-hint {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-align: center;
+    width: 400px;
 }
 
 /* TELA DE RANKING (GAME OVER) */
@@ -311,7 +382,6 @@ canvas {
     font-weight: bold;
 }
 
-/* Destaque para o vencedor */
 .rank-item.winner {
     background: rgba(0, 210, 255, 0.15);
     border-radius: 10px;

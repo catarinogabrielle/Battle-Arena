@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Battle Arena - Ranking System</title>
+    <title>Battle Arena - Combate</title>
     <link rel="stylesheet" href="style-arena.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="shortcut icon" href="assets/logo-los.png" type="image/x-icon">
@@ -12,39 +12,48 @@
 
 <body>
     <div id="damage-overlay"></div>
-    <div id="spectator-ui" class="hidden">MODO ESPECTADOR: OBSERVANDO A BATALHA...</div>
+    <div id="spectator-ui" class="hidden">MODO ESPECTADOR</div>
+    <div id="spell-warning" class="hidden">⚠️ AVISO!</div>
 
     <header class="hud-top">
-        <div class="hud-alive">
-            <i class="fas fa-users"></i> VIVOS: <span id="alive-count" class="highlight">6</span>
-        </div>
-        <div class="hud-zone">
-            <i class="fas fa-radiation-alt" style="color: #ff3d68;"></i> ZONA ATIVA
-        </div>
         <button class="btn-leave" onclick="window.location.href='menu.html'">
             <i class="fas fa-sign-out-alt"></i> SAIR
         </button>
+        <div class="hud-zone">
+            <i class="fas fa-radiation-alt" style="color: #ff3d68;"></i> ZONA ATIVA
+        </div>
+        <div class="hud-alive">
+            <i class="fas fa-users"></i> VIVOS: <span id="alive-count" class="highlight">6</span>
+        </div>
     </header>
 
     <canvas id="gameCanvas"></canvas>
+
     <aside class="kill-feed" id="kill-feed"></aside>
 
     <footer class="hud-bottom" id="player-hud">
-        <div class="player-status p1-status">
-            <div class="status-header">
-                <span class="p-name">KAELEN</span>
-                <span class="p-weapon">ESPADA LENDÁRIA</span>
+        <div class="player-panel">
+            <div class="panel-header">
+                <span id="player-name-hud">KAELEN_BR</span>
+                <span id="hud-weapon-name">ESPADA LENDÁRIA</span>
             </div>
-            <div class="hp-bar-container">
+
+            <div class="hp-bar-bg">
                 <div class="hp-bar-fill" id="p1-hp-fill"></div>
             </div>
-            <div class="attack-energy-container">
-                <div id="p1-pips-container" class="pips-list"></div>
+
+            <div class="pips-wrapper">
+                <div id="p1-pips-container" class="pips-container">
+                </div>
                 <div id="p1-reloader" class="circular-loader hidden">
                     <div class="loader-inner"></div>
                 </div>
-                <span class="energy-text" id="p1-energy-text">5/5</span>
+                <span id="p1-energy-text" class="pips-counter">5/5</span>
             </div>
+        </div>
+
+        <div class="controls-hint">
+            W,A,S,D: Mover | ESPAÇO: Correr | MOUSE: Atacar
         </div>
     </footer>
 
@@ -54,14 +63,12 @@
 
         <div class="ranking-container">
             <h3>RANKING DA PARTIDA</h3>
-            <div id="ranking-list">
-            </div>
+            <div id="ranking-list"></div>
         </div>
 
         <div class="end-actions">
-            <button class="btn-play-again" onclick="window.location.reload()">
-                <i class="fas fa-redo"></i> JOGAR NOVAMENTE
-            </button>
+            <button class="btn-play-again" onclick="window.location.reload()"><i class="fas fa-redo"></i> JOGAR
+                NOVAMENTE</button>
             <button class="btn-menu" onclick="window.location.href='menu.html'">MENU</button>
         </div>
     </div>
