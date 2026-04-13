@@ -8,57 +8,158 @@
     <link rel="stylesheet" href="style-login.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="shortcut icon" href="assets/logo-los.png" type="image/x-icon">
+    <style>
+        /* Estilo para a mensagem de erro da API */
+        #login-error {
+            color: #ff3d68;
+            font-size: 0.9em;
+            text-align: center;
+            margin-top: 15px;
+            font-weight: bold;
+            display: none;
+            background: rgba(255, 61, 104, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ff3d68;
+        }
+    </style>
 </head>
 
 <body>
-
     <div class="login-container">
-
         <div class="game-logo">
             <img src="assets/logo-los.png" alt="Last One Standing Logo">
         </div>
 
-        <div class="login-panel">
+        <div class="login-panel" id="main-panel">
             <form id="login-form">
                 <div class="input-group">
                     <i class="fas fa-envelope input-icon"></i>
-                    <input type="email" placeholder="name@example.com" required>
+                    <input type="email" id="email" placeholder="name@example.com" required>
                 </div>
 
                 <div class="input-group">
                     <i class="fas fa-lock input-icon"></i>
-                    <input type="password" placeholder="********" required>
+                    <input type="password" id="password" placeholder="********" required>
                 </div>
 
-                <button type="submit" class="login-button">
+                <button type="submit" class="login-button" id="btn-submit">
                     LOGIN <i class="fas fa-chevron-right button-arrow"></i>
                 </button>
+
+                <div id="login-error">Erro ao conectar!</div>
             </form>
 
-            <div class="login-links">
+            <div class="login-links" style="justify-content: center;">
                 <a href="#">ESQUECEU A SENHA?</a>
-                <a href="#">CRIAR CONTA</a>
             </div>
         </div>
-
     </div>
 
+    <script src="api-ygaming.js"></script>
+
     <script>
-        document.getElementById('login-form').addEventListener('submit', function (event) {
-            // Isso impede que a página recarregue (o comportamento padrão de um form)
+        // ==========================================
+        // FLUXO 1: AUTO-LOGIN VIA PLAYFRONT (URL ?token=...)
+        // ==========================================
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlToken = urlParams.get('token');
+
+            if (urlToken) {
+                // Bloqueia a interface para o jogador não mexer
+                const btn = document.getElementById('btn-submit');
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> CONECTANDO YGAMING...';
+                btn.disabled = true;
+
+                // Envia o token da URL para o Backend Local (Proxy) validar
+                // Conforme documentação: Frontend lê ?token -> Envia POST para /api/auth/jwt no servidor local.
+                fetch('/api/auth/jwt', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: urlToken })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success || data.id) {
+                            // Se for válido, o backend local já deve retornar os dados do perfil.
+                            // Cria um objeto similar ao que a API retorna para usarmos a mesma função de salvar
+                            const apiSimulada = {
+                                data: {
+                                    accessToken: urlToken,
+                                    user: data.user || data // Adapte conforme o retorno do seu proxy
+                                }
+                            };
+                            YGamingAPI.saveSession(apiSimulada);
+                            window.location.href = 'menu.html';
+                        } else {
+                            mostrarErro("Token YGaming inválido ou expirado.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Erro no Auto-Login:", error);
+                        mostrarErro("Erro de comunicação com o servidor local.");
+                    });
+            }
+        };
+
+        // ==========================================
+        // FLUXO 2: LOGIN DIRETO (FORMULÁRIO MANUAL)
+        // ==========================================
+        document.getElementById('login-form').addEventListener('submit', async function (event) {
             event.preventDefault();
 
-            // Muda o texto do botão para dar um feedback visual
-            const btn = document.querySelector('.login-button');
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            const btn = document.getElementById('btn-submit');
+            const errorDiv = document.getElementById('login-error');
+
+            // Feedback visual de carregamento
+            errorDiv.style.display = 'none';
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AUTENTICANDO...';
+            btn.disabled = true;
 
-            // Aguarda 0.8 segundos (800ms) e redireciona para o Menu
-            setTimeout(() => {
-                window.location.href = 'menu.html';
-            }, 800);
+            // Chama a API YGaming através do nosso Wrapper
+            const result = await YGamingAPI.login(email, password);
+
+            if (result.success === true) {
+                // Sucesso!
+                YGamingAPI.saveSession(result);
+
+                btn.innerHTML = '<i class="fas fa-check"></i> CONECTADO!';
+
+                // Aguarda 500ms para o jogador ver o check e vai pro menu
+                setTimeout(() => {
+                    window.location.href = 'menu.html';
+                }, 500);
+            } else {
+                // Falha de Autenticação (Senha Errada, Email não encontrado, etc)
+                // Se a API retornar 401, o result.message geralmente diz o motivo
+                let msgErro = result.message || "E-mail ou senha incorretos!";
+
+                // Tratamento específico caso o fetch fale
+                if (!result.message && !result.success) {
+                    msgErro = "Erro ao conectar com o servidor.";
+                }
+
+                mostrarErro(msgErro);
+            }
         });
-    </script>
 
+        // Função auxiliar para exibir erros na interface
+        function mostrarErro(mensagem) {
+            const errorDiv = document.getElementById('login-error');
+            const btn = document.getElementById('btn-submit');
+
+            errorDiv.innerText = mensagem;
+            errorDiv.style.display = 'block';
+
+            // Restaura o botão
+            btn.innerHTML = 'LOGIN <i class="fas fa-chevron-right button-arrow"></i>';
+            btn.disabled = false;
+        }
+    </script>
 </body>
 
 </html>
